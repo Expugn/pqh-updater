@@ -65,6 +65,9 @@ class FileWriter:
         self.cursor.execute(command)
         return self.cursor.fetchall()
 
+    def close_db_connection(self):
+        self.db.close_connection()
+
     @staticmethod
     def equipment_get_type(full_id):
         return str(full_id)[:-4]
