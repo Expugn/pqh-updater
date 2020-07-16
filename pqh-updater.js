@@ -59,7 +59,9 @@ function run() {
             write_character_data().then(() => {
                 write_quest_data().then(() => {
                     get_new_images();
-                    create_spritesheets();
+                    create_spritesheets().then(() => {
+                        console.log('UPDATE COMPLETE!');
+                    });
                 });
             });
         });

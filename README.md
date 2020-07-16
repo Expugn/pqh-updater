@@ -1,7 +1,7 @@
 # pqh-updater | Node.js Version
 
 ## Information
-`pqh-updater` is a tool written in Python to automatically generate the `.json` files needed for 
+`pqh-updater` is a tool written using JavaScript (Node.js) and Python to automatically generate the `.json` files needed for 
 [priconne-quest-helper](https://github.com/Expugn/priconne-quest-helper).
 
 This repository is public in case people are interested in the process behind the updating of `priconne-quest-helper` or datamining `Princess Connect! Re:Dive` in general.  
@@ -36,10 +36,12 @@ Under `system`, change `priconne-quest-helper_directory` to the directory where 
 
 Example Path: `C:\\Users\\%UserName%\\Desktop\\priconne-quest-helper`
 
-Once you set the path, you can just run the program.
+Once you set the path, **make sure you have all the dependencies installed** (listed below).
+
+Then you can just run the program via the command line interface like:<br>
+`node pqh-updater.js`
 
 **Unless you know what you're doing, do NOT edit the other values in the `config.json`.**
-
 
 ## Requirements
 #### System
