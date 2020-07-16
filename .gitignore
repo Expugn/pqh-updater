@@ -1,6 +1,7 @@
-\data
+\.idea
+\database
 \extract
 \out
-\venv
-\.idea
-\__pycache__
+\setup
+\node_modules
+\config.json

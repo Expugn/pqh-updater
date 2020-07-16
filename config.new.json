@@ -1,0 +1,36 @@
+{
+  "system": {
+    "priconne-quest-helper_directory": "YOUR_priconne-quest-helper_DIRECTORY_PATH_HERE",
+    "setup_directory": "setup",
+    "output_directory": "out"
+  },
+
+  "database": {
+    "directory": "database",
+    "download_directory": "extract",
+    "default_truth_version": 10010800,
+    "max_test_amount": 20,
+    "test_multiplier": 10
+  },
+
+  "equipment_dictionary": {
+    "full_equipment": "10",
+    "equipment_fragment": "11",
+    "equipment_blueprint": "12",
+
+    "fragment_suffix": " （欠片） ",
+    "blueprint_suffix": "の設計図",
+
+    "rarity-1": "common",
+    "rarity-2": "copper",
+    "rarity-3": "silver",
+    "rarity-4": "gold",
+    "rarity-5": "purple"
+  },
+
+  "quest_dictionary": {
+    "normal_difficulty": "11",
+    "hard_difficulty": "12",
+    "very_hard_difficulty": "13"
+  }
+}
