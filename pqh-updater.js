@@ -36,19 +36,23 @@ function run() {
         // COPY REQUIRED priconne-quest-helper FILES
         const character_data_path = path.join(pqh_dir, 'data', 'character_data.json'),
             equipment_data_path = path.join(pqh_dir, 'data', 'equipment_data.json'),
+            dictionary_path = path.join(pqh_dir, 'data', 'dictionary.json'),
             jp_lang_path = path.join(pqh_dir, 'language', 'ja-JP.json');
         if (!fs.existsSync(character_data_path) ||
             !fs.existsSync(equipment_data_path) ||
+            !fs.existsSync(dictionary_path) ||
             !fs.existsSync(jp_lang_path)) {
-            console.log('REQUIRED FILE IS MISSING ; CHECK THE config.json system.priconne-quest-helper_directory VALUE.\n' +
+            console.log('A REQUIRED FILE IS MISSING ; CHECK THE config.json system.priconne-quest-helper_directory VALUE.\n' +
                 '-', character_data_path, '\n' +
                 '-', equipment_data_path, '\n' +
+                '-', dictionary_path, '\n' +
                 '-', jp_lang_path, '\n');
             return;
         }
         else {
             fs.copyFileSync(character_data_path, path.join(setup_dir, 'character_data.json'));
             fs.copyFileSync(equipment_data_path, path.join(setup_dir, 'equipment_data.json'));
+            fs.copyFileSync(dictionary_path, path.join(setup_dir, 'dictionary.json'));
             fs.copyFileSync(jp_lang_path, path.join(setup_dir, 'ja-JP.json'));
 
             console.log('SUCCESSFULLY COPIED ALL REQUIRED priconne-quest-helper FILES')
@@ -60,6 +64,7 @@ function run() {
                 write_quest_data().then(() => {
                     get_new_images();
                     create_spritesheets().then(() => {
+                        update_dictionary();
                         console.log('UPDATE COMPLETE!');
                     });
                 });
@@ -337,6 +342,7 @@ function get_new_images() {
                 }
                 fs.copyFileSync(files[file_name]["decrypted_path"], files[file_name]["output_png_path"]);
                 console.log('COPYING TO OUTPUT FOLDER:', files[file_name]["decrypted_path"], '->', files[file_name]["output_png_path"]);
+                fs.copyFileSync(files[file_name]['decrypted_path'], files[file_name]['setup_path']);
                 console.log('COPYING TO SETUP FOLDER', files[file_name]["decrypted_path"], '->', files[file_name]["setup_path"]);
                 convert_to_webp(files[file_name]["decrypted_path"], files[file_name]["output_webp_path"]);
             }
@@ -1174,5 +1180,38 @@ function write_quest_data() {
         }
 
         return data;
+    }
+}
+
+function update_dictionary() {
+    const equipment_data = JSON.parse(fs.readFileSync(path.join('.', config["system"]["output_directory"], "data", "equipment_data.json"), 'utf-8'));
+    const dictionary = JSON.parse(fs.readFileSync(path.join('.', config["system"]["setup_directory"], "dictionary.json"), 'utf-8'));
+    const dictionary_entry = {
+        "ja-JP": "",
+        "en-US": "",
+        "ko-KR": "",
+        "zh-CN": "",
+        "is_fragment": false
+    };
+    console.log('UPDATING dictionary.json...');
+    for (const key in equipment_data) {
+        if (!dictionary["equipment"].hasOwnProperty(key)) {
+            console.log("MISSING DICTIONARY ENTRY FOUND:", key);
+            dictionary_entry["ja-JP"] = equipment_data[key]["name_jp"];
+            dictionary_entry["en-US"] = equipment_data[key]["name"];
+            dictionary_entry["is_fragment"] = (equipment_data[key]["fragment_id"].substring(0, 2) === config.equipment_dictionary.equipment_fragment);
+            dictionary["equipment"][key] = clone_object(dictionary_entry);
+        }
+    }
+
+    // SAVE FILE
+    const output_path = path.join(config["system"]["output_directory"], "data", "dictionary.json");
+    fs.writeFile(output_path, JSON.stringify(dictionary, null, 4), async function(err) {
+        if (err) throw err;
+        console.log('DICTIONARY UPDATE COMPLETE ; SAVED AS', output_path);
+    });
+
+    function clone_object(object) {
+        return Object.assign({}, object);
     }
 }
