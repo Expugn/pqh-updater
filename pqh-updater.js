@@ -62,10 +62,11 @@ function run() {
         write_equipment_data().then(() => {
             write_character_data().then(() => {
                 write_quest_data().then(() => {
-                    get_new_images();
-                    create_spritesheets().then(() => {
-                        update_dictionary();
-                        console.log('UPDATE COMPLETE!');
+                    get_new_images().then(() => {
+                        create_spritesheets().then(() => {
+                            update_dictionary();
+                            console.log('UPDATE COMPLETE!');
+                        });
                     });
                 });
             });
@@ -277,7 +278,7 @@ function create_spritesheets() {
 }
 
 function get_new_images() {
-    return new Promise (async () => {
+    return new Promise (async (resolve) => {
         console.log('SEARCHING FOR NEW ITEMS...');
         let file_queue = [];
 
@@ -331,6 +332,9 @@ function get_new_images() {
             if (!fs.existsSync(dir_path)) {
                 fs.mkdirSync(dir_path);
             }
+            if (!fs.existsSync(path.join('setup', 'images'))) {
+                fs.mkdirSync(path.join('setup', 'images'));
+            }
             for (const file_name in files) {
                 const png_dir_path = path.join(dir_path, files[file_name]["type"]),
                     webp_dir_path = path.join(dir_path, files[file_name]["type"] + "_webp");
@@ -347,6 +351,8 @@ function get_new_images() {
                 convert_to_webp(files[file_name]["decrypted_path"], files[file_name]["output_webp_path"]);
             }
         }
+
+        resolve();
     });
 }
 
@@ -492,6 +498,7 @@ function write_equipment_data() {
             "silver": 1,
             "gold": 1,
             "purple": 1,
+            "red": 1,
             "misc": 1
         };
         let db, result, data = {};
@@ -756,50 +763,56 @@ function write_character_data() {
                     equip_slot_5 = (es_5 !== 999999) ? equipment_data[es_5.toString()]["name"] : "",
                     equip_slot_6 = (es_6 !== 999999) ? equipment_data[es_6.toString()]["name"] : "";
 
-                // GET UNIT KEY / NAME_EN / THEMATIC_EN / NAME_JP / THEMATIC_JP
-                if (full_unit_name.indexOf("（") > -1) {
-                    // PARENTHESIS EXISTS... MEANS THERE'S PROBABLY A THEMATIC
-                    let parenthesis_index = full_unit_name.indexOf("（");
-                    thematic_jp = full_unit_name.substring(parenthesis_index + 1, full_unit_name.length - 1);
-                    thematic_en = thematic_jp_to_en_dictionary[thematic_jp];
-                    name_jp = full_unit_name.substring(0, parenthesis_index);
-                    name_en = name_jp_to_en_dictionary[name_jp];
-                    unit_key = thematic_en + '_' + name_en;
-
-                    // CAPITALIZE name_en AND thematic_en
-                    name_en = name_en.charAt(0).toUpperCase() + name_en.slice(1);
-                    if (thematic_en.indexOf('_') === -1) {
-                        thematic_en = thematic_en.charAt(0).toUpperCase() + thematic_en.slice(1);
-                    }
-                    else {
-                        let split_thematic = thematic_en.split('_');
-                        thematic_en = "";
-                        split_thematic.forEach((thematic_part) => {
-                            thematic_en += thematic_part.charAt(0).toUpperCase() + thematic_part.slice(1) + " ";
-                        });
-                        // REMOVE THE LAST (UNNECESSARY) SPACE
-                        thematic_en = thematic_en.substring(0, thematic_en.length - 1);
-                    }
+                if (full_unit_name === undefined || unit_id === 106801) {
+                    // TODO REMOVE WHEN LABYRISTA IS RELEASED
+                    console.log('undefined or laby', unit_id);
                 }
                 else {
-                    // NO PARENTHESIS. JUST BASIC UNIT NAME
-                    unit_key = name_jp_to_en_dictionary[full_unit_name];
-                    name_en = unit_key.charAt(0).toUpperCase() + unit_key.slice(1);
-                    name_jp = full_unit_name;
-                }
+                    // GET UNIT KEY / NAME_EN / THEMATIC_EN / NAME_JP / THEMATIC_JP
+                    if (full_unit_name.indexOf("（") > -1) {
+                        // PARENTHESIS EXISTS... MEANS THERE'S PROBABLY A THEMATIC
+                        let parenthesis_index = full_unit_name.indexOf("（");
+                        thematic_jp = full_unit_name.substring(parenthesis_index + 1, full_unit_name.length - 1);
+                        thematic_en = thematic_jp_to_en_dictionary[thematic_jp];
+                        name_jp = full_unit_name.substring(0, parenthesis_index);
+                        name_en = name_jp_to_en_dictionary[name_jp];
+                        unit_key = thematic_en + '_' + name_en;
 
-                // INSERT UNIT DATA (IF IT DOESN'T ALREADY EXIST)
-                if (!data.hasOwnProperty(unit_key)) {
-                    data[unit_key] = {
-                        "unit_id": unit_id,
-                        "name": name_en,
-                        "thematic": thematic_en,
-                        "name_jp": name_jp,
-                        "thematic_jp": thematic_jp
-                    };
+                        // CAPITALIZE name_en AND thematic_en
+                        name_en = name_en.charAt(0).toUpperCase() + name_en.slice(1);
+                        if (thematic_en.indexOf('_') === -1) {
+                            thematic_en = thematic_en.charAt(0).toUpperCase() + thematic_en.slice(1);
+                        }
+                        else {
+                            let split_thematic = thematic_en.split('_');
+                            thematic_en = "";
+                            split_thematic.forEach((thematic_part) => {
+                                thematic_en += thematic_part.charAt(0).toUpperCase() + thematic_part.slice(1) + " ";
+                            });
+                            // REMOVE THE LAST (UNNECESSARY) SPACE
+                            thematic_en = thematic_en.substring(0, thematic_en.length - 1);
+                        }
+                    }
+                    else {
+                        // NO PARENTHESIS. JUST BASIC UNIT NAME
+                        unit_key = name_jp_to_en_dictionary[full_unit_name];
+                        name_en = unit_key.charAt(0).toUpperCase() + unit_key.slice(1);
+                        name_jp = full_unit_name;
+                    }
+
+                    // INSERT UNIT DATA (IF IT DOESN'T ALREADY EXIST)
+                    if (!data.hasOwnProperty(unit_key)) {
+                        data[unit_key] = {
+                            "unit_id": unit_id,
+                            "name": name_en,
+                            "thematic": thematic_en,
+                            "name_jp": name_jp,
+                            "thematic_jp": thematic_jp
+                        };
+                    }
+                    // INSERT RANK EQUIPMENT
+                    data[unit_key]["rank_" + promotion_level] = [equip_slot_1, equip_slot_2, equip_slot_3, equip_slot_4, equip_slot_5, equip_slot_6];
                 }
-                // INSERT RANK EQUIPMENT
-                data[unit_key]["rank_" + promotion_level] = [equip_slot_1, equip_slot_2, equip_slot_3, equip_slot_4, equip_slot_5, equip_slot_6];
             }
         });
 
