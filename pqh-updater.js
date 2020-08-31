@@ -408,7 +408,7 @@ function extract_images(file_queue) {
                 id = id.substring(0, 4) + '0' + id.substring(5);
                 for (const key in character_data) {
                     if (character_data[key]["unit_id"] === parseInt(id)) {
-                        output_name = character_data[key]["thematic"] + " " + character_data[key]["name"];
+                        output_name = ((character_data[key]["thematic"] !== "") ? character_data[key]["thematic"] + " " : "") + character_data[key]["name"];
                         break;
                     }
                 }
@@ -763,9 +763,8 @@ function write_character_data() {
                     equip_slot_5 = (es_5 !== 999999) ? equipment_data[es_5.toString()]["name"] : "",
                     equip_slot_6 = (es_6 !== 999999) ? equipment_data[es_6.toString()]["name"] : "";
 
-                if (full_unit_name === undefined || unit_id === 106801) {
-                    // TODO REMOVE WHEN LABYRISTA IS RELEASED
-                    console.log('undefined or laby', unit_id);
+                if (full_unit_name === undefined || unit_id === 113701) {
+                    console.log('undefined', unit_id);
                 }
                 else {
                     // GET UNIT KEY / NAME_EN / THEMATIC_EN / NAME_JP / THEMATIC_JP
