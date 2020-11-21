@@ -763,7 +763,7 @@ function write_character_data() {
                     equip_slot_5 = (es_5 !== 999999) ? equipment_data[es_5.toString()]["name"] : "",
                     equip_slot_6 = (es_6 !== 999999) ? equipment_data[es_6.toString()]["name"] : "";
 
-                if (full_unit_name === undefined || unit_id === 113701) {
+                if (full_unit_name === undefined) {
                     console.log('undefined', unit_id);
                 }
                 else {
