@@ -129,7 +129,7 @@ function update_database() {
 
                     // RESET LOOP
                     truth_version = guess;
-                    i = 1;
+                    i = 0;
                 }
             }
         })().then(() => {

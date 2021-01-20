@@ -25,7 +25,8 @@
     "rarity-2": "copper",
     "rarity-3": "silver",
     "rarity-4": "gold",
-    "rarity-5": "purple"
+    "rarity-5": "purple",
+    "rarity-6": "red"
   },
 
   "quest_dictionary": {

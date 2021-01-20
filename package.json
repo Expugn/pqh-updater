@@ -6,11 +6,13 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "cookie-parser": "~1.4.4",
     "debug": "^4.1.1",
     "eslint": "^7.4.0",
     "express": "^4.17.1",
     "fs-extra": "^9.0.1",
+    "ini": "^2.0.0",
     "morgan": "^1.10.0",
     "ncp": "^2.0.0",
     "pm2": "^4.4.0",
@@ -19,6 +21,7 @@
     "readline-sync": "^1.4.10",
     "sqlite": "^4.0.11",
     "sqlite3": "^5.0.0",
+    "systeminformation": "^4.34.7",
     "webp-converter": "^2.2.8"
   }
 }
