@@ -64,7 +64,7 @@ function run() {
                 write_quest_data().then(() => {
                     get_new_images().then(() => {
                         create_spritesheets().then(() => {
-                            update_dictionary();
+                            // update_dictionary();
                             console.log('UPDATE COMPLETE!');
                         });
                     });
@@ -884,7 +884,7 @@ function write_quest_data() {
             driver: sqlite3.Database
         });
 
-        result = await db.all('SELECT quest_id, quest_name, wave_group_id_1, wave_group_id_2, wave_group_id_3 FROM quest_data');
+        result = await db.all('SELECT quest_id, quest_name, stamina, wave_group_id_1, wave_group_id_2, wave_group_id_3 FROM quest_data');
         result.forEach((entry) => {
             const quest_id = entry["quest_id"];
             let quest_type = quest_id.toString().substring(0, 2);
@@ -913,6 +913,7 @@ function write_quest_data() {
                 quest_data[quest_id.toString()] = {
                     "id": quest_id,
                     "name": quest_full_name,
+                    "stamina": entry["stamina"],
                     "key": quest_chapter + '-' + quest_number + quest_type,
                     "difficulty": quest_difficulty,
                     "wave_group_id_1": entry["wave_group_id_1"],
@@ -1133,7 +1134,8 @@ function write_quest_data() {
         // INIT QUEST ENTRY
         const quest_key = quest['key'];
         data[quest_key] = {
-            "name": quest['name']
+            "name": quest['name'],
+            "stamina": quest['stamina']
         };
 
         // ADD ITEMS 1 - 4
