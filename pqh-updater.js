@@ -499,6 +499,7 @@ function write_equipment_data() {
             "gold": 1,
             "purple": 1,
             "red": 1,
+            "green": 1,
             "misc": 1
         };
         let db, result, data = {};
