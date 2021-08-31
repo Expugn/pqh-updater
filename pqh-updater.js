@@ -793,6 +793,13 @@ function write_character_data() {
                             thematic_en = thematic_en.substring(0, thematic_en.length - 1);
                         }
                     }
+                    else if (full_unit_name.indexOf("＆") > -1) {
+                        // & EXISTS.. MEANS IT'S PROBABLY A DUAL UNIT
+                        const names = full_unit_name.split("＆");
+                        name_jp = full_unit_name;
+                        name_en = `${name_jp_to_en_dictionary[names[0]].charAt(0).toUpperCase() + name_jp_to_en_dictionary[names[0]].slice(1)} & ${name_jp_to_en_dictionary[names[1]].charAt(0).toUpperCase() + name_jp_to_en_dictionary[names[1]].slice(1)}`;
+                        unit_key = `${name_jp_to_en_dictionary[names[0]]}_&_${name_jp_to_en_dictionary[names[1]]}`;
+                    }
                     else {
                         // NO PARENTHESIS. JUST BASIC UNIT NAME
                         unit_key = name_jp_to_en_dictionary[full_unit_name];
@@ -819,8 +826,9 @@ function write_character_data() {
         // SORT DICTIONARY ALPHABETICALLY
         let sorted_character_names = [], characters_with_thematics = {};
         Object.keys(data).forEach((key) => {
-            if (key.indexOf('_') === -1) {
+            if (key.indexOf('_') === -1 || key.indexOf('&') > -1) {
                 // NO '_' MEANS NO THEMATIC
+                // & MEANS DUAL UNIT
                 sorted_character_names.push(key);
             }
             else {
