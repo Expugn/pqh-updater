@@ -63,9 +63,13 @@ function run() {
             write_character_data().then(() => {
                 write_quest_data().then(() => {
                     get_new_images().then(() => {
-                        create_spritesheets().then(() => {
+                        create_spritesheets().then(async () => {
                             // update_dictionary();
                             console.log('UPDATE COMPLETE!');
+
+                            // MOVE OUTPUT FILES TO priconne-quest-helper DIRECTORY
+                            console.log('COPYING FILES OVER TO priconne-quest-helper DIRECTORY (Use Git to revert changes if needed).');
+                            copy_to_pqh();
                         });
                     });
                 });
@@ -221,7 +225,7 @@ function update_database() {
                 let bundle = '';
                 http.request({
                     host: 'prd-priconne-redive.akamaized.net',
-                    path: '/dl/Resources/' + truth_version + '/Jpn/AssetBundles/Windows/manifest/icon_assetmanifest',
+                    path: '/dl/Resources/' + truth_version + '/Jpn/AssetBundles/Windows/manifest/icon2_assetmanifest',
                     method: 'GET',
                 }, (res) => {
                     res.on('data', function(chunk) {
@@ -231,7 +235,7 @@ function update_database() {
                         bundle += '\n';
                         http.request({
                             host: 'prd-priconne-redive.akamaized.net',
-                            path: '/dl/Resources/' + truth_version + '/Jpn/AssetBundles/Windows/manifest/unit_assetmanifest',
+                            path: '/dl/Resources/' + truth_version + '/Jpn/AssetBundles/Windows/manifest/unit2_assetmanifest',
                             method: 'GET',
                         }, (res) => {
                             res.on('data', function(chunk) {
@@ -685,19 +689,6 @@ function write_equipment_data() {
 
     function rarity_id_to_rarity_string(rarity_id) {
         return equipment_dictionary['rarity-' + rarity_id];
-    }
-
-    function sendQuestion(query) {
-        const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-        });
-
-        return new Promise(resolve => rl.question(query, (answer) => {
-            rl.close();
-            process.stdin.destroy();
-            resolve(answer);
-        }))
     }
 }
 
@@ -1206,6 +1197,33 @@ function write_quest_data() {
     }
 }
 
+function copy_to_pqh() {
+    // MOVE OUTPUT FILES TO priconne-quest-helper DIRECTORY
+    return new Promise (async (resolve) => {
+        // await sendQuestion("Press ENTER to copy files over to priconne-quest-helper directory...\n\tEXIT PROGRAM IF YOU DON'T WANT TO COPY FILES OVER.");
+
+        const root = config.system.output_directory;
+        console.log(`READING ${root} DIRECTORY...`);
+        browse_directory(root);
+
+        function browse_directory(directory) {
+            const files = fs.readdirSync(directory);
+            // console.log(files);
+            for (const file of files) {
+                if (fs.statSync(path.join(directory, file)).isDirectory()) {
+                    browse_directory(path.join(directory, file));
+                }
+                else {
+                    const file_path = path.join(directory, file);
+                    const pqh_path = path.join(config.system['priconne-quest-helper_directory'], file_path.replace(`${config.system.output_directory}\\`, ""));
+                    console.log(`COPYING ${file_path} -> ${pqh_path}`);
+                    fs.copyFileSync(file_path, pqh_path);
+                }
+            }
+        }
+    });
+}
+
 function update_dictionary() {
     const equipment_data = JSON.parse(fs.readFileSync(path.join('.', config["system"]["output_directory"], "data", "equipment_data.json"), 'utf-8'));
     const dictionary = JSON.parse(fs.readFileSync(path.join('.', config["system"]["setup_directory"], "dictionary.json"), 'utf-8'));
@@ -1237,4 +1255,17 @@ function update_dictionary() {
     function clone_object(object) {
         return Object.assign({}, object);
     }
+}
+
+function sendQuestion(query) {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
+
+    return new Promise(resolve => rl.question(query, (answer) => {
+        rl.close();
+        process.stdin.destroy();
+        resolve(answer);
+    }))
 }
