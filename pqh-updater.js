@@ -785,11 +785,15 @@ function write_character_data() {
                         }
                     }
                     else if (full_unit_name.indexOf("＆") > -1) {
-                        // & EXISTS.. MEANS IT'S PROBABLY A DUAL UNIT
+                        // & EXISTS.. MEANS IT'S PROBABLY A DUAL/TRIO/MULTIPLE-IN-ONE UNIT
                         const names = full_unit_name.split("＆");
                         name_jp = full_unit_name;
-                        name_en = `${name_jp_to_en_dictionary[names[0]].charAt(0).toUpperCase() + name_jp_to_en_dictionary[names[0]].slice(1)} & ${name_jp_to_en_dictionary[names[1]].charAt(0).toUpperCase() + name_jp_to_en_dictionary[names[1]].slice(1)}`;
-                        unit_key = `${name_jp_to_en_dictionary[names[0]]}_&_${name_jp_to_en_dictionary[names[1]]}`;
+                        name_en = `${name_jp_to_en_dictionary[names[0]].charAt(0).toUpperCase() + name_jp_to_en_dictionary[names[0]].slice(1)}`;
+                        unit_key = `${name_jp_to_en_dictionary[names[0]]}`;
+                        for (let i = 1 ; i < names.length ; i++) {
+                            name_en += ` & ${name_jp_to_en_dictionary[names[i]].charAt(0).toUpperCase() + name_jp_to_en_dictionary[names[i]].slice(1)}`;
+                            unit_key += `_&_${name_jp_to_en_dictionary[names[i]]}`
+                        }
                     }
                     else {
                         // NO PARENTHESIS. JUST BASIC UNIT NAME
@@ -819,7 +823,7 @@ function write_character_data() {
         Object.keys(data).forEach((key) => {
             if (key.indexOf('_') === -1 || key.indexOf('&') > -1) {
                 // NO '_' MEANS NO THEMATIC
-                // & MEANS DUAL UNIT
+                // & MEANS DUAL/TRIO/MULTIPLE-IN-ONE UNIT
                 sorted_character_names.push(key);
             }
             else {
