@@ -27,7 +27,8 @@
     "rarity-4": "gold",
     "rarity-5": "purple",
     "rarity-6": "red",
-    "rarity-7": "green"
+    "rarity-7": "green",
+    "rarity-8": "orange"
   },
 
   "quest_dictionary": {
