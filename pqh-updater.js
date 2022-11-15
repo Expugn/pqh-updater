@@ -36,23 +36,19 @@ function run() {
         // COPY REQUIRED priconne-quest-helper FILES
         const character_data_path = path.join(pqh_dir, 'data', 'character_data.json'),
             equipment_data_path = path.join(pqh_dir, 'data', 'equipment_data.json'),
-            dictionary_path = path.join(pqh_dir, 'data', 'dictionary.json'),
             jp_lang_path = path.join(pqh_dir, 'language', 'ja-JP.json');
         if (!fs.existsSync(character_data_path) ||
             !fs.existsSync(equipment_data_path) ||
-            !fs.existsSync(dictionary_path) ||
             !fs.existsSync(jp_lang_path)) {
             console.log('A REQUIRED FILE IS MISSING ; CHECK THE config.json system.priconne-quest-helper_directory VALUE.\n' +
                 '-', character_data_path, '\n' +
                 '-', equipment_data_path, '\n' +
-                '-', dictionary_path, '\n' +
                 '-', jp_lang_path, '\n');
             return;
         }
         else {
             fs.copyFileSync(character_data_path, path.join(setup_dir, 'character_data.json'));
             fs.copyFileSync(equipment_data_path, path.join(setup_dir, 'equipment_data.json'));
-            fs.copyFileSync(dictionary_path, path.join(setup_dir, 'dictionary.json'));
             fs.copyFileSync(jp_lang_path, path.join(setup_dir, 'ja-JP.json'));
 
             console.log('SUCCESSFULLY COPIED ALL REQUIRED priconne-quest-helper FILES')
@@ -64,7 +60,6 @@ function run() {
                 write_quest_data().then(() => {
                     get_new_images().then(() => {
                         create_spritesheets().then(async () => {
-                            // update_dictionary();
                             console.log('UPDATE COMPLETE!');
 
                             // MOVE OUTPUT FILES TO priconne-quest-helper DIRECTORY
@@ -771,7 +766,9 @@ function write_character_data() {
                         unit_key = thematic_en + '_' + name_en;
 
                         // CAPITALIZE name_en AND thematic_en
-                        name_en = name_en.charAt(0).toUpperCase() + name_en.slice(1);
+                        name_en = name_en.split('_').map(word => {
+                            return word.charAt(0).toUpperCase() + word.slice(1);
+                        }).join(' ');
                         if (thematic_en.indexOf('_') === -1) {
                             thematic_en = thematic_en.charAt(0).toUpperCase() + thematic_en.slice(1);
                         }
@@ -789,7 +786,9 @@ function write_character_data() {
                         // & EXISTS.. MEANS IT'S PROBABLY A DUAL/TRIO/MULTIPLE-IN-ONE UNIT
                         const names = full_unit_name.split("＆");
                         name_jp = full_unit_name;
-                        name_en = `${name_jp_to_en_dictionary[names[0]].charAt(0).toUpperCase() + name_jp_to_en_dictionary[names[0]].slice(1)}`;
+                        name_en = name_jp_to_en_dictionary[names[0]].split('_').map(word => {
+                            return word.charAt(0).toUpperCase() + word.slice(1);
+                        }).join(' ');
                         unit_key = `${name_jp_to_en_dictionary[names[0]]}`;
                         for (let i = 1 ; i < names.length ; i++) {
                             name_en += ` & ${name_jp_to_en_dictionary[names[i]].charAt(0).toUpperCase() + name_jp_to_en_dictionary[names[i]].slice(1)}`;
@@ -799,7 +798,9 @@ function write_character_data() {
                     else {
                         // NO PARENTHESIS. JUST BASIC UNIT NAME
                         unit_key = name_jp_to_en_dictionary[full_unit_name];
-                        name_en = unit_key.charAt(0).toUpperCase() + unit_key.slice(1);
+                        name_en = unit_key.split('_').map(word => {
+                            return word.charAt(0).toUpperCase() + word.slice(1);
+                        }).join(' ');
                         name_jp = full_unit_name;
                     }
 
@@ -1135,6 +1136,13 @@ function write_quest_data() {
         let quest_drops = get_quest_drops({}, wave_group_info[quest["wave_group_id_1"]]);
         quest_drops = get_quest_drops(quest_drops, wave_group_info[quest["wave_group_id_2"]]);
         quest_drops = get_quest_drops(quest_drops, wave_group_info[quest["wave_group_id_3"]]);
+        // console.log(quest_drops);
+
+        if (Object.keys(quest_drops).length <= 0) {
+            // quest has no drops
+            console.log("QUEST DROPS IS EMPTY!!!", quest);
+            return data;
+        }
 
         // INIT QUEST ENTRY
         const quest_key = quest['key'];

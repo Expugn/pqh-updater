@@ -6,10 +6,10 @@
  * @param {string}    export_path    PATH TO EXPORT THE .png FILE TO
  * @return {Promise<any>}
  */
-function deserialize_unity3d(import_path, export_path) {
+function deserialize_unity3d(import_path, export_path, silent = false) {
     const py_file = 'python-tools/deserialize.py',
         options = { args: [import_path, export_path] };
-    return run_python(py_file, options);
+    return run_python(py_file, options, silent);
 }
 
 /**
