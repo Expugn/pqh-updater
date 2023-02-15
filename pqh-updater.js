@@ -500,6 +500,7 @@ function write_equipment_data() {
             "red": 1,
             "green": 1,
             "orange": 1,
+            "lightblue": 1,
             "misc": 1
         };
         let db, result, data = {};
